@@ -36,17 +36,17 @@ def visualize_predictions(predictions, targets, save_path=None):
     idx = np.arange(len(predictions))
     
     # 绘制真实值和预测值
-    plt.scatter(idx, targets, color='blue', label='真实回弹值', alpha=0.7)
-    plt.scatter(idx, predictions, color='red', label='预测回弹值', alpha=0.7)
+    plt.scatter(idx, targets, color='blue', label='Real error', alpha=0.7)
+    plt.scatter(idx, predictions, color='red', label='Predicted error', alpha=0.7)
     
     # 绘制理想预测线（y=x）
     min_val = min(np.min(targets), np.min(predictions))
     max_val = max(np.max(targets), np.max(predictions))
     plt.plot([min_val, max_val], [min_val, max_val], 'k--', lw=2)
     
-    plt.xlabel('样本索引')
-    plt.ylabel('回弹误差值')
-    plt.title('回弹预测对比')
+    plt.xlabel('Sample Index')
+    plt.ylabel('Springback error')
+    plt.title('Compare Springback')
     plt.legend()
     plt.grid(True, alpha=0.3)
     
@@ -95,11 +95,11 @@ def visualize_error_heatmap(point_series, predictions, targets, save_path=None):
     plt.figure(figsize=(10, 8))
     scatter = plt.scatter(means, stds, c=errors.flatten(), 
                           cmap='viridis', alpha=0.8, s=50)
-    plt.colorbar(scatter, label='预测误差')
+    plt.colorbar(scatter, label='Prediction Error')
     
-    plt.xlabel('点序列均值')
-    plt.ylabel('点序列标准差')
-    plt.title('点序列特征与预测误差关系')
+    plt.xlabel('Point series mean')
+    plt.ylabel('Standard deviation of point sequence')
+    plt.title('Relationship between point sequence characteristics and prediction error')
     plt.grid(True, alpha=0.3)
     
     plt.tight_layout()
@@ -124,12 +124,12 @@ def visualize_training_history(history, save_path=None):
     """
     plt.figure(figsize=(10, 6))
     
-    plt.plot(history['train_loss'], label='训练损失')
-    plt.plot(history['val_loss'], label='验证损失')
+    plt.plot(history['train_loss'], label='Train loss')
+    plt.plot(history['val_loss'], label='Val loss')
     
     plt.xlabel('Epoch')
-    plt.ylabel('损失')
-    plt.title('训练和验证损失')
+    plt.ylabel('Loss')
+    plt.title('Train and val loss')
     plt.legend()
     plt.grid(True, alpha=0.3)
     
@@ -162,16 +162,16 @@ def visualize_grid_representation(point_series, save_path=None):
     plt.subplot(1, 2, 1)
     plt.scatter(range(9), point_series)
     plt.plot(range(9), point_series, 'b-', alpha=0.5)
-    plt.title("点序列散点图")
-    plt.xlabel("序列位置")
-    plt.ylabel("高度差值")
+    plt.title("Point sequence scatter plot")
+    plt.xlabel("Sequence position")
+    plt.ylabel("Height difference")
     plt.grid(True)
     
     # 右侧：3×3网格热力图表示
     plt.subplot(1, 2, 2)
     im = plt.imshow(grid_data, cmap='viridis')
-    plt.colorbar(im, label='高度差值')
-    plt.title("3×3网格表示")
+    plt.colorbar(im, label='Height difference')
+    plt.title("3×3 Grid Representation")
     
     # 添加网格值标注
     for i in range(3):
@@ -212,19 +212,19 @@ def visualize_compensation(original_profile, predicted_errors, save_path=None):
     
     # 绘制原始剖面
     plt.plot(original_profile[:, 0], original_profile[:, 1], 'k-', 
-             label='目标剖面', linewidth=2)
+             label='Target profile', linewidth=2)
     
     # 绘制回弹剖面
     plt.plot(springback_profile[:, 0], springback_profile[:, 1], 'r--', 
-             label='回弹剖面(预测)', linewidth=2)
+             label='Springback profile (prediction)', linewidth=2)
     
     # 绘制补偿剖面
     plt.plot(compensated_profile[:, 0], compensated_profile[:, 1], 'g-', 
-             label='补偿剖面', linewidth=2)
+             label='Compensation profile', linewidth=2)
     
-    plt.xlabel('X坐标')
-    plt.ylabel('Z坐标')
-    plt.title('工具路径补偿效果可视化')
+    plt.xlabel('X coordinate')
+    plt.ylabel('Z coordinate')
+    plt.title('Visualization of tool path compensation effect')
     plt.legend()
     plt.grid(True, alpha=0.3)
     

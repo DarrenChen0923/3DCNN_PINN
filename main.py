@@ -7,9 +7,9 @@
 集成3D CNN与PINN的SPIF回弹误差预测系统
 
 使用方法:
-python main.py --grid_size 20 --batch_size 64 --epochs 1000
+python main.py --grid_size 20 --batch_size 16 --epochs 1000 --patience 1000
 
-作者: Claude
+作者: Du Chen
 日期: 2025-04-28
 """
 
@@ -49,7 +49,7 @@ def parse_args():
     # 系统相关参数
     parser.add_argument('--device', type=str, default='auto', help='训练设备，可选: cuda, cpu, auto')
     parser.add_argument('--output_dir', type=str, default='results', help='输出目录')
-    parser.add_argument('--visualize', action='store_true', help='是否可视化结果')
+    parser.add_argument('--visualize', action='store_true',default=True, help='是否可视化结果')
     
     return parser.parse_args()
 
