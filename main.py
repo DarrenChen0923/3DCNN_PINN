@@ -1,16 +1,8 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """
-单点渐进成型回弹误差预测系统 - 主程序
+Single point incremental forming springback error prediction system - main program
 =================================
-集成3D CNN与PINN的SPIF回弹误差预测系统
-
-使用方法:
+How to use:
 python main.py --grid_size 20 --batch_size 16 --epochs 1000 --patience 1000
-
-作者: Du Chen
-日期: 2025-04-28
 """
 
 import os
@@ -28,61 +20,61 @@ from utils import save_results, save_model_info, inverse_transform_predictions, 
 
 
 def parse_args():
-    """解析命令行参数"""
-    parser = argparse.ArgumentParser(description='单点渐进成型回弹误差预测系统')
+    """Parsing command line arguments"""
+    parser = argparse.ArgumentParser(description='Single point incremental forming springback error prediction system')
     
-    # 数据相关参数
-    parser.add_argument('--test_size', type=float, default=0.2, help='测试集比例')
-    parser.add_argument('--val_size', type=float, default=0.25, help='验证集比例')
-    parser.add_argument('--seed', type=int, default=42, help='随机种子')
-    parser.add_argument('--grid_size', type=int, default=10, help='网格大小（mm）')
+    # Data related parameters
+    parser.add_argument('--test_size', type=float, default=0.2, help='Test set ratio')
+    parser.add_argument('--val_size', type=float, default=0.25, help='Val set ratio')
+    parser.add_argument('--seed', type=int, default=42, help='Random Seed')
+    parser.add_argument('--grid_size', type=int, default=10, help='Grid size(mm)')
 
     
-    # 模型相关参数
-    parser.add_argument('--batch_size', type=int, default=16, help='批处理大小')
-    parser.add_argument('--epochs', type=int, default=100, help='训练周期数')
-    parser.add_argument('--lr', type=float, default=0.001, help='学习率')
-    parser.add_argument('--patience', type=int, default=20, help='早停耐心值')
-    parser.add_argument('--boundary_weight', type=float, default=0.05, help='边界约束权重')
-    parser.add_argument('--smoothness_weight', type=float, default=0.05, help='光滑性约束权重')
+    # Model related parameters
+    parser.add_argument('--batch_size', type=int, default=16, help='batch size')
+    parser.add_argument('--epochs', type=int, default=100, help='training epochs')
+    parser.add_argument('--lr', type=float, default=0.001, help='learing rate')
+    parser.add_argument('--patience', type=int, default=20, help='Early Stop Patience Value')
+    parser.add_argument('--boundary_weight', type=float, default=0.05, help='Boundary Constraint Weight')
+    parser.add_argument('--smoothness_weight', type=float, default=0.05, help='Smoothness constraint weight')
     
-    # 系统相关参数
-    parser.add_argument('--device', type=str, default='auto', help='训练设备，可选: cuda, cpu, auto')
-    parser.add_argument('--output_dir', type=str, default='results', help='输出目录')
-    parser.add_argument('--visualize', action='store_true',default=True, help='是否可视化结果')
+    # System related parameters
+    parser.add_argument('--device', type=str, default='auto', help='Training device, optional: cuda, cpu, auto')
+    parser.add_argument('--output_dir', type=str, default='results', help='Output Directory')
+    parser.add_argument('--visualize', action='store_true',default=False, help='Whether to visualize the results')
     
     return parser.parse_args()
 
 
 def main():
-    """主函数"""
-    # 解析命令行参数
+    """Main funciton"""
+    # Parsing command line arguments
     args = parse_args()
     
-    # 创建输出目录
+    # Build output directory
     timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
     output_dir = os.path.join(args.output_dir, f"grid_{args.grid_size}mm_{timestamp}")
     os.makedirs(output_dir, exist_ok=True)
     
-    # 设置随机种子
+    # set random seed
     set_seed(args.seed)
     
-    # 设置设备
+    # set device
     if args.device == 'auto':
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     else:
         device = torch.device(args.device)
     
-    print(f"使用设备: {device}")
+    print(f"Use device: {device}")
     
-    # 修改为使用网格大小加载数据
-    print(f"加载网格大小为 {args.grid_size}mm 的数据")
+    # Modified to use grid size to load data
+    print(f"Load data with a grid size of {args.grid_size}mm")
     point_series, errors = load_data_by_grid_size(args.grid_size)
-    print(f"加载完成: {len(point_series)} 个样本")
+    print(f"Loading completed: {len(point_series)} samples")
     
-    # 显示数据示例
+    # Display data example
     if args.visualize:
-        print("样本点序列可视化...")
+        print("Sample point series visualization...")
         sample_idx = 0
         sample_point_series = point_series[sample_idx]
         visualize_grid_representation(
@@ -90,8 +82,8 @@ def main():
             save_path=os.path.join(output_dir, 'sample_grid.png')
         )
     
-    # 预处理数据
-    print("预处理数据...")
+    # Preprocessing Data
+    print("Preprocessing Data...")
     data_dict = preprocess_data(
         point_series, errors, 
         test_size=args.test_size, 
@@ -99,15 +91,15 @@ def main():
         random_state=args.seed
     )
     
-    # 创建数据加载器
-    print(f"创建数据加载器, 批大小: {args.batch_size}")
+    # Creating a Data Loader
+    print(f"Creating a Data Loader, batch size: {args.batch_size}")
     loaders = create_data_loaders(data_dict, batch_size=args.batch_size)
     
-    # 初始化模型
-    print("初始化模型...")
+    # Init model
+    print("Init model...")
     model = CNN3D_PINN_Model()
     
-    # 保存模型信息
+    # save model information
     save_model_info(
         model, 
         os.path.join(output_dir, 'model_info.json'),
@@ -121,19 +113,19 @@ def main():
         }
     )
     
-    # 初始化训练组件
-    print(f"初始化优化器和学习率调度器, 学习率: {args.lr}")
+    # Initialize training components
+    print(f"Initialize optimizer and learning rate scheduler, learning rate: {args.lr}")
     optimizer, scheduler = init_training(model, lr=args.lr, patience=10)
     
-    # 定义损失函数
-    print(f"定义损失函数, 边界权重: {args.boundary_weight}, 光滑性权重: {args.smoothness_weight}")
+    # Define the loss function
+    print(f"Define loss function, boundary weight: {args.boundary_weight}, smoothness weight: {args.smoothness_weight}")
     criterion = PhysicsLoss(
         boundary_weight=args.boundary_weight, 
         smoothness_weight=args.smoothness_weight
     )
     
-    # 训练模型
-    print(f"开始训练, 最大周期数: {args.epochs}, 早停耐心值: {args.patience}")
+    # Train model
+    print(f"Start training, maximum number of epochs: {args.epochs}, early stopping patience value: {args.patience}")
     start_time = time.time()
     
     model, history = train_model(
@@ -150,32 +142,32 @@ def main():
     )
     
     training_time = time.time() - start_time
-    print(f"训练完成, 耗时: {training_time:.2f} 秒")
+    print(f"Training completed, took: {training_time:.2f} seconds")
     
-    # 可视化训练历史
+    # Visualizing training history
     if args.visualize:
-        print("可视化训练历史...")
+        print("Visualizing training history...")
         visualize_training_history(
             history, 
             save_path=os.path.join(output_dir, 'training_history.png')
         )
     
-    # 评估模型
-    print("评估模型...")
+    # Evaluating the Model
+    print("Evaluating the Model...")
     eval_results = evaluate_model(
         model=model,
         test_loader=loaders['test_loader'],
         device=device
     )
     
-    # 反标准化预测结果
+    # Denormalized prediction results
     orig_predictions, orig_targets = inverse_transform_predictions(
         eval_results['predictions'], 
         eval_results['targets'], 
         data_dict['y_scaler']
     )
     
-    # 保存评估结果
+    # Save the evaluation results
     eval_results.update({
         'orig_predictions': orig_predictions,
         'orig_targets': orig_targets,
@@ -187,22 +179,23 @@ def main():
         os.path.join(output_dir, 'evaluation_results.json')
     )
     
-    # 打印评估指标
-    print("\n=== 评估指标 ===")
+    # Print Print evaluation metrics
+    print("\n=== Ealuation metrics ===")
     print(f"MAE: {eval_results['mae']:.4f}")
+    print(f"MSE: {eval_results['mse']:.4f}")
     print(f"RMSE: {eval_results['rmse']:.4f}")
     print(f"R²: {eval_results['r2']:.4f}")
     
-    # 可视化预测结果
+    # Visualizing prediction results
     if args.visualize:
-        print("可视化预测结果...")
+        print("Visualizing prediction results...")
         visualize_predictions(
             orig_predictions, 
             orig_targets, 
             save_path=os.path.join(output_dir, 'predictions.png')
         )
         
-        print("生成误差热力图...")
+        print("Generate error heatmap...")
         visualize_error_heatmap(
             data_dict['X_test'], 
             eval_results['predictions'], 
@@ -210,7 +203,7 @@ def main():
             save_path=os.path.join(output_dir, 'error_heatmap.png')
         )
     
-    print(f"\n所有结果已保存至: {output_dir}")
+    print(f"\nAll results saved to: {output_dir}")
 
 
 if __name__ == "__main__":

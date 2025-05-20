@@ -1,12 +1,10 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """
-模型训练模块
+Model training module
 ==========
-定义模型训练、评估和保存的功能
+Defines the functions of model training, evaluation and saving
 
-包含训练循环、早停机制、模型评估等功能。
+Includes functions such as training loop, early stopping mechanism, model evaluation, etc.
 """
 
 import os
@@ -20,43 +18,43 @@ def train_model(model, train_loader, val_loader, criterion, optimizer,
                 num_epochs=100, device='cpu', scheduler=None, 
                 patience=20, save_dir='./models'):
     """
-    训练模型
+    Model training
     
     Args:
-        model: 模型
-        train_loader: 训练数据加载器
-        val_loader: 验证数据加载器
-        criterion: 损失函数
-        optimizer: 优化器
-        num_epochs: 训练周期数
-        device: 训练设备
-        scheduler: 学习率调度器
-        patience: 早停耐心值
-        save_dir: 模型保存目录
+        model: model
+        train_loader: training data loader
+        val_loader: validation data loader
+        criterion: loss function
+        optimizer: optimizer
+        num_epochs: number of training cycles
+        device: training device
+        scheduler: learning rate scheduler
+        patience: early stopping patience value
+        save_dir: model save directory
         
     Returns:
-        model: 训练好的模型
-        history: 训练历史记录
+        model: trained model
+        history: training history
     """
-    # 确保保存目录存在
+    # Make sure the save directory exists
     os.makedirs(save_dir, exist_ok=True)
     
-    # 将模型移至设备
+    # Move the model to the device
     model.to(device)
     
-    # 记录训练和验证损失
+    # Log training and validation losses
     history = {
         'train_loss': [],
         'val_loss': [],
     }
     
-    # 早停设置
+    # Early stop setting
     best_val_loss = float('inf')
     counter = 0
     
-    # 训练循环
+    # Training loop
     for epoch in range(num_epochs):
-        # 训练阶段
+        # Training Stage
         model.train()
         train_loss = 0.0
         
@@ -64,24 +62,24 @@ def train_model(model, train_loader, val_loader, criterion, optimizer,
             point_series = batch['point_series'].to(device)
             error = batch['error'].to(device)
             
-            # 清零梯度
+            # Zero gradient
             optimizer.zero_grad()
             
-            # 前向传播
+            # Forward
             outputs, _, _ = model(point_series)
             loss = criterion(outputs, error, point_series)
             
-            # 反向传播和优化
+            # Backpropagation and optimization
             loss.backward()
             optimizer.step()
             
             train_loss += loss.item()
         
-        # 计算平均训练损失
+        # Calculate the average training loss
         train_loss /= len(train_loader)
         history['train_loss'].append(train_loss)
         
-        # 验证阶段
+        # Verification Phase
         model.eval()
         val_loss = 0.0
         
@@ -90,29 +88,29 @@ def train_model(model, train_loader, val_loader, criterion, optimizer,
                 point_series = batch['point_series'].to(device)
                 error = batch['error'].to(device)
                 
-                # 前向传播
+                # Forward Propagation
                 outputs, _, _ = model(point_series)
                 loss = criterion(outputs, error, point_series)
                 
                 val_loss += loss.item()
             
-            # 计算平均验证损失
+            # Calculate the average validation loss
             val_loss /= len(val_loader)
             history['val_loss'].append(val_loss)
         
-        # 打印当前epoch的损失
+        # Print the loss of the current epoch
         print(f'Epoch {epoch+1}/{num_epochs} - '
               f'Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}')
         
-        # 学习率调度
+        # Learning rate scheduling
         if scheduler is not None:
             scheduler.step(val_loss)
         
-        # 早停检查
+        # Early stop check
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             counter = 0
-            # 保存最佳模型
+            # Save the best model
             torch.save(model.state_dict(), os.path.join(save_dir, 'best_model.pth'))
             print(f'Best model saved with validation loss: {best_val_loss:.4f}')
         else:
@@ -121,14 +119,14 @@ def train_model(model, train_loader, val_loader, criterion, optimizer,
                 print(f'Early stopping at epoch {epoch+1}')
                 break
     
-    # 加载最佳模型
+    # Load the best model
     model.load_state_dict(torch.load(os.path.join(save_dir, 'best_model.pth')))
     
     return model, history
 
 
 def evaluate_model(model, test_loader, device='cpu'):
-    """评估模型性能"""
+    """evaluate_model"""
     model.eval()
     all_preds = []
     all_targets = []
@@ -138,23 +136,23 @@ def evaluate_model(model, test_loader, device='cpu'):
             point_series = batch['point_series'].to(device)
             error = batch['error'].to(device)
             
-            # 前向传播
+            # forward
             outputs, _, _ = model(point_series)
             
-            # 收集预测和目标
+            # Gather forecasts and goals
             all_preds.append(outputs.cpu().numpy())
             all_targets.append(error.cpu().numpy())
     
-    # 转换为NumPy数组
+    # Convert to NumPy array
     all_preds = np.vstack(all_preds)
     all_targets = np.vstack(all_targets)
     
-    # 计算评估指标
+    # Calculating evaluation metrics
     mae = float(np.mean(np.abs(all_preds - all_targets)))  # 转换为Python float
     mse = float(np.mean((all_preds - all_targets)**2))     # 转换为Python float
     rmse = float(np.sqrt(mse))                             # 转换为Python float
     
-    # 计算R^2
+    # Calculating R^2
     ss_tot = np.sum((all_targets - np.mean(all_targets))**2)
     ss_res = np.sum((all_targets - all_preds)**2)
     r2 = float(1 - (ss_res / ss_tot)) if ss_tot > 0 else 0  # 转换为Python float
@@ -171,20 +169,20 @@ def evaluate_model(model, test_loader, device='cpu'):
 
 def init_training(model, lr=0.001, patience=10):
     """
-    初始化训练组件
-    
+    Initialize training components
+
     Args:
-        model: 模型
-        lr: 学习率
-        patience: 学习率调度器耐心值
-        
+    model: model
+    lr: learning rate
+    patience: learning rate scheduler patience value
+
     Returns:
-        优化器和学习率调度器
+    optimizer and learning rate scheduler
     """
-    # 优化器
+    # optimizer
     optimizer = optim.Adam(model.parameters(), lr=lr)
     
-    # 学习率调度器
+    # Learning Rate Scheduler
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode='min', factor=0.5, patience=patience, verbose=True
     )

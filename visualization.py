@@ -1,45 +1,41 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """
-可视化模块
+Visualization module
 ========
-提供预测结果和误差场的可视化功能
+Provides visualization functions for prediction results and error fields
 
-包含绘制预测对比图、误差热力图、训练历史曲线等功能。
+Includes functions such as drawing prediction comparison charts, error heat maps, and training history curves.
 """
-
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# 设置绘图样式
+# Setting the drawing style
 plt.style.use('seaborn-v0_8-whitegrid')
 
 
 def visualize_predictions(predictions, targets, save_path=None):
     """
-    可视化预测值与真实值对比
-    
+    Visualize the comparison between predicted values ​​and true values
+
     Args:
-        predictions: 预测值 [n_samples, 1]
-        targets: 真实值 [n_samples, 1]
-        save_path: 保存路径
-        
+    predictions: predicted values ​​[n_samples, 1]
+    targets: true values ​​[n_samples, 1]
+    save_path: save path
+
     Returns:
-        None
+    None
     """
     plt.figure(figsize=(10, 6))
     
-    # 创建索引作为X轴
+    # Create an index as the X axis
     idx = np.arange(len(predictions))
     
-    # 绘制真实值和预测值
+    # Plot the true and predicted values
     plt.scatter(idx, targets, color='blue', label='Real error', alpha=0.7)
     plt.scatter(idx, predictions, color='red', label='Predicted error', alpha=0.7)
     
-    # 绘制理想预测线（y=x）
+    # Draw the ideal prediction line (y=x)
     min_val = min(np.min(targets), np.min(predictions))
     max_val = max(np.max(targets), np.max(predictions))
     plt.plot([min_val, max_val], [min_val, max_val], 'k--', lw=2)
@@ -50,7 +46,7 @@ def visualize_predictions(predictions, targets, save_path=None):
     plt.legend()
     plt.grid(True, alpha=0.3)
     
-    # 添加指标文本
+    # Add indicator text
     mae = np.mean(np.abs(predictions - targets))
     rmse = np.sqrt(np.mean((predictions - targets)**2))
     ss_tot = np.sum((targets - np.mean(targets))**2)
@@ -64,34 +60,34 @@ def visualize_predictions(predictions, targets, save_path=None):
     
     if save_path:
         plt.savefig(save_path, dpi=300)
-        print(f'预测对比图已保存至: {save_path}')
+        print(f'The forecast comparison chart has been saved to: {save_path}')
     
     plt.show()
 
 
 def visualize_error_heatmap(point_series, predictions, targets, save_path=None):
     """
-    生成误差热力图可视化
-    
+    Generate error heat map visualization
+
     Args:
-        point_series: 点序列数据 [n_samples, 9]
-        predictions: 预测值 [n_samples, 1]
-        targets: 真实值 [n_samples, 1]
-        save_path: 保存路径
-        
+    point_series: point series data [n_samples, 9]
+    predictions: predicted value [n_samples, 1]
+    targets: true value [n_samples, 1]
+    save_path: save path
+
     Returns:
-        None
+    None
     """
-    # 计算预测误差
+    # Calculating prediction error
     errors = np.abs(predictions - targets)
     
-    # 计算每个样本的点序列几何特征
-    # 这里我们用点的平均值和方差作为特征
+    # Calculate the geometric features of the point sequence of each sample
+    # Here we use the mean and variance of the points as features
     n_samples = point_series.shape[0]
     means = np.mean(point_series.reshape(n_samples, -1), axis=1)
     stds = np.std(point_series.reshape(n_samples, -1), axis=1)
     
-    # 创建2D散点图，颜色代表误差大小
+    # Create a 2D scatter plot with colors representing the error size
     plt.figure(figsize=(10, 8))
     scatter = plt.scatter(means, stds, c=errors.flatten(), 
                           cmap='viridis', alpha=0.8, s=50)
@@ -106,21 +102,21 @@ def visualize_error_heatmap(point_series, predictions, targets, save_path=None):
     
     if save_path:
         plt.savefig(save_path, dpi=300)
-        print(f'误差热力图已保存至: {save_path}')
+        print(f'Error heatmap saved to: {save_path}')
     
     plt.show()
 
 
 def visualize_training_history(history, save_path=None):
     """
-    可视化训练历史
-    
+    Visualize training history
+
     Args:
-        history: 训练历史字典
-        save_path: 保存路径
-        
+    history: training history dictionary
+    save_path: save path
+
     Returns:
-        None
+    None
     """
     plt.figure(figsize=(10, 6))
     
@@ -137,28 +133,28 @@ def visualize_training_history(history, save_path=None):
     
     if save_path:
         plt.savefig(save_path, dpi=300)
-        print(f'训练历史曲线已保存至: {save_path}')
+        print(f'The training history curve has been saved to: {save_path}')
     
     plt.show()
 
 
 def visualize_grid_representation(point_series, save_path=None):
     """
-    可视化点序列的3x3网格表示
-    
+    Visualize a 3x3 grid representation of a point series
+
     Args:
-        point_series: 单个点序列 [9]
-        save_path: 保存路径
-        
+    point_series: a single point series [9]
+    save_path: save path
+
     Returns:
-        None
+    None
     """
-    # 将点序列重塑为3x3网格
+    # Reshape the point sequence into a 3x3 grid
     grid_data = point_series.reshape(3, 3)
     
     plt.figure(figsize=(8, 6))
     
-    # 左侧：点序列散点图
+    # Left: Scatter plot of point series
     plt.subplot(1, 2, 1)
     plt.scatter(range(9), point_series)
     plt.plot(range(9), point_series, 'b-', alpha=0.5)
@@ -167,13 +163,13 @@ def visualize_grid_representation(point_series, save_path=None):
     plt.ylabel("Height difference")
     plt.grid(True)
     
-    # 右侧：3×3网格热力图表示
+    # Right: 3×3 grid heat map representation
     plt.subplot(1, 2, 2)
     im = plt.imshow(grid_data, cmap='viridis')
     plt.colorbar(im, label='Height difference')
     plt.title("3×3 Grid Representation")
     
-    # 添加网格值标注
+    # Adding grid value annotations
     for i in range(3):
         for j in range(3):
             plt.text(j, i, f"{grid_data[i, j]:.2f}", 
@@ -183,55 +179,6 @@ def visualize_grid_representation(point_series, save_path=None):
     
     if save_path:
         plt.savefig(save_path, dpi=300)
-        print(f'网格表示图已保存至: {save_path}')
-    
-    plt.show()
-
-
-def visualize_compensation(original_profile, predicted_errors, save_path=None):
-    """
-    可视化工具路径补偿效果
-    
-    Args:
-        original_profile: 原始剖面曲线 [n_points, 2]
-        predicted_errors: 预测的回弹误差 [n_points]
-        save_path: 保存路径
-        
-    Returns:
-        None
-    """
-    # 计算补偿后的剖面
-    compensated_profile = original_profile.copy()
-    compensated_profile[:, 1] -= predicted_errors  # 负补偿
-    
-    # 计算假设的回弹后剖面
-    springback_profile = original_profile.copy()
-    springback_profile[:, 1] += predicted_errors
-    
-    plt.figure(figsize=(10, 6))
-    
-    # 绘制原始剖面
-    plt.plot(original_profile[:, 0], original_profile[:, 1], 'k-', 
-             label='Target profile', linewidth=2)
-    
-    # 绘制回弹剖面
-    plt.plot(springback_profile[:, 0], springback_profile[:, 1], 'r--', 
-             label='Springback profile (prediction)', linewidth=2)
-    
-    # 绘制补偿剖面
-    plt.plot(compensated_profile[:, 0], compensated_profile[:, 1], 'g-', 
-             label='Compensation profile', linewidth=2)
-    
-    plt.xlabel('X coordinate')
-    plt.ylabel('Z coordinate')
-    plt.title('Visualization of tool path compensation effect')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    
-    plt.tight_layout()
-    
-    if save_path:
-        plt.savefig(save_path, dpi=300)
-        print(f'补偿效果图已保存至: {save_path}')
+        print(f'Grid representation saved to: {save_path}')
     
     plt.show()
