@@ -153,5 +153,6 @@ python main.py --grid_size 20 --batch_size 16 --epochs 1000 --patience 100 --bou
 | `--output_dir` | Directory to save results (default: 'results') |
 
 # Results
-![image](https://github.com/user-attachments/assets/3b12c1a9-8e28-436a-9a9d-e24b0bf8d225)
+<img width="466" alt="image" src="https://github.com/user-attachments/assets/402a7eb5-4d03-4073-a763-7b4d12077c18" />
+
 
