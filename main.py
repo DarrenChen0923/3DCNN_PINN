@@ -2,7 +2,7 @@
 Single point incremental forming springback error prediction system - main program
 =================================
 How to use:
-python main.py --grid_size 20 --batch_size 16 --epochs 1000 --patience 1000
+python main.py --grid_size 20 --batch_size 32 --epochs 1000 --patience 50
 """
 
 import os
@@ -24,24 +24,24 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Single point incremental forming springback error prediction system')
     
     # Data related parameters
-    parser.add_argument('--test_size', type=float, default=0.2, help='Test set ratio')
-    parser.add_argument('--val_size', type=float, default=0.25, help='Val set ratio')
+    parser.add_argument('--test_size', type=float, default=0.1, help='Test set ratio')
+    parser.add_argument('--val_size', type=float, default=0.1, help='Val set ratio')
     parser.add_argument('--seed', type=int, default=42, help='Random Seed')
     parser.add_argument('--grid_size', type=int, default=10, help='Grid size(mm)')
 
     
     # Model related parameters
-    parser.add_argument('--batch_size', type=int, default=16, help='batch size')
-    parser.add_argument('--epochs', type=int, default=100, help='training epochs')
+    parser.add_argument('--batch_size', type=int, default=32, help='batch size')
+    parser.add_argument('--epochs', type=int, default=1000, help='training epochs')
     parser.add_argument('--lr', type=float, default=0.001, help='learing rate')
-    parser.add_argument('--patience', type=int, default=20, help='Early Stop Patience Value')
-    parser.add_argument('--boundary_weight', type=float, default=0.05, help='Boundary Constraint Weight')
-    parser.add_argument('--smoothness_weight', type=float, default=0.05, help='Smoothness constraint weight')
+    parser.add_argument('--patience', type=int, default=50, help='Early Stop Patience Value')
+    parser.add_argument('--boundary_weight', type=float, default=0.002, help='Boundary Constraint Weight')
+    parser.add_argument('--smoothness_weight', type=float, default=0.001, help='Smoothness constraint weight')
     
     # System related parameters
     parser.add_argument('--device', type=str, default='auto', help='Training device, optional: cuda, cpu, auto')
     parser.add_argument('--output_dir', type=str, default='results', help='Output Directory')
-    parser.add_argument('--visualize', action='store_true',default=False, help='Whether to visualize the results')
+    parser.add_argument('--visualize', action='store_true',default=True, help='Whether to visualize the results')
     
     return parser.parse_args()
 
@@ -53,7 +53,7 @@ def main():
     
     # Build output directory
     timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-    output_dir = os.path.join(args.output_dir, f"grid_{args.grid_size}mm_{timestamp}")
+    output_dir = os.path.join(args.output_dir, f"grid_{args.grid_size}mm_{timestamp}_P1")
     os.makedirs(output_dir, exist_ok=True)
     
     # set random seed

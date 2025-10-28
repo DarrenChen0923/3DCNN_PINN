@@ -1,0 +1,50 @@
+{
+    "grid_size": 5,
+    "num_test_samples": 2106,
+    "num_buckets": 5,
+    "bucket_edges": [
+        0.8788329088464764,
+        12.236477494835253,
+        25.889360381634077,
+        40.61616786313422,
+        62.37541443865696,
+        69.95761064235472
+    ],
+    "models_evaluated": [
+        "cnn",
+        "pinn",
+        "fusion"
+    ],
+    "results": {
+        "cnn": {
+            "global": {
+                "mae": 0.18034689128398895,
+                "rmse": 0.2407687454516545,
+                "r2": 0.9421533197164536
+            },
+            "low_boundary_quantile": 0.2,
+            "low_boundary_threshold": 12.236477494835253,
+            "num_low_boundary_samples": 422
+        },
+        "pinn": {
+            "global": {
+                "mae": 0.4283449053764343,
+                "rmse": 0.5931223513319972,
+                "r2": 0.6489517390727997
+            },
+            "low_boundary_quantile": 0.2,
+            "low_boundary_threshold": 12.236477494835253,
+            "num_low_boundary_samples": 422
+        },
+        "fusion": {
+            "global": {
+                "mae": 0.1668660044670105,
+                "rmse": 0.223447189587789,
+                "r2": 0.9501772113144398
+            },
+            "low_boundary_quantile": 0.2,
+            "low_boundary_threshold": 12.236477494835253,
+            "num_low_boundary_samples": 422
+        }
+    }
+}

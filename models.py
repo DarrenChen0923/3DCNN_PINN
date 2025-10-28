@@ -182,7 +182,7 @@ class PhysicsLoss(nn.Module):
     
     Combining data fitting loss and physical constraint loss
     """
-    def __init__(self, boundary_weight=0.1, smoothness_weight=0.1):
+    def __init__(self, boundary_weight=0.001, smoothness_weight=0.001):
         """
         Initialize the physical constraint loss function
         

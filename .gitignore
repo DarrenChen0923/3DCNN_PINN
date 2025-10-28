@@ -1,3 +1,6 @@
 data
 data_origin
 results
+ablation_experiments
+weight_ablation
+weights_cp

@@ -1,0 +1,16 @@
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lcccc}
+\toprule
+Grid & MAE$_{\text{low}}$(CNN) & MAE$_{\text{low}}$(PINN) & MAE$_{\text{low}}$(Fusion) & $\Delta$(Fusion vs CNN) \\
+\midrule
+5mm & 0.208 & 0.764 & 0.200 & 3.7\% [ -5.8, 13.0 ] \\
+10mm & 0.195 & 0.459 & 0.191 & 1.9\% [ -6.3, 9.4 ] \\
+15mm & 0.183 & 0.313 & 0.182 & 0.3\% [ -8.0, 7.4 ] \\
+20mm & 0.173 & 0.247 & 0.170 & 1.6\% [ -7.2, 9.6 ] \\
+\bottomrule
+\end{tabular}
+\caption{Low-boundary MAE across grid sizes (lower is better). $\Delta$ shows Fusion over CNN improvement with 95\% bootstrap CI.}
+\label{tab:low_boundary_across_grids}
+\end{table}

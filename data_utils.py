@@ -26,6 +26,7 @@ def load_data_by_grid_size(grid_size):
     """
     # Build folder path
     folder_path = f"data/{grid_size}mm_file"
+    # folder_path = f"data/new_data/P1/{grid_size}mm_file"
     
     # Check if a folder exists
     if not os.path.exists(folder_path):
@@ -97,7 +98,7 @@ def load_single_file(file_path):
     return np.array(point_series), np.array(errors)
 
 
-def preprocess_data(point_series, errors, test_size=0.2, val_size=0.25, random_state=42):
+def preprocess_data(point_series, errors, test_size=0.1, val_size=0.1, random_state=42):
     """
     Preprocessing point series data: Standardizing and partitioning the dataset
     
